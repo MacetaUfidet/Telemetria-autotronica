@@ -1,0 +1,24 @@
+TELEMETRÍA APLICADA A LA AUTOTRÓNICA — SITIO WEB INICIAL
+
+CONTENIDO
+- index.html: sitio web responsive en español.
+- assets/: imágenes aportadas (pinout LoRa RA-02, DHT11, ESP32 y MIT App Inventor).
+- documentos/: PDFs aportados por el usuario.
+
+CÓMO VERLO
+1. Extraé el ZIP.
+2. Abrí index.html en un navegador moderno.
+3. Para publicar gratis, podés usar GitHub Pages (sitio estático).
+
+PUBLICACIÓN GRATIS EN GITHUB PAGES (resumen)
+1. Crear una cuenta en https://github.com/
+2. Crear un repositorio público nuevo.
+3. Subir index.html y las carpetas assets/ y documentos/.
+4. En Settings > Pages, elegir publicar desde la rama principal y la carpeta raíz.
+5. Esperar a que GitHub indique la dirección pública.
+
+NOTAS TÉCNICAS
+- La web es estática; el buscador filtra los recursos ya listados, no busca en Internet.
+- Para agregar contenido, editar index.html y subir nuevos archivos.
+- Las especificaciones deben confirmarse contra la variante exacta del componente.
+- Las señales automotrices no deben conectarse directamente a los GPIO del ESP32 sin interfaz de protección adecuada.

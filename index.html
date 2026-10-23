@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Material educativo sobre telemetría aplicada a la autotrónica: ESP32, sensores, LoRa, App Inventor, hardware y software.">
+<title>Telemetría Aplicada a la Autotrónica</title>
+<style>
+:root{--bg:#08111f;--panel:#101d30;--panel2:#14243a;--text:#eaf2ff;--muted:#a9bad1;--line:#263954;--cyan:#54d6e8;--blue:#5594ff;--lime:#a8e66b;--radius:18px}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:86px}body{margin:0;background:radial-gradient(ellipse at 80% 0%,#132a49 0,transparent 42%),var(--bg);color:var(--text);font:16px/1.65 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+a{color:var(--cyan)}a:hover{color:#fff}.wrap{width:min(1160px,92%);margin:auto}
+header{position:sticky;top:0;z-index:10;background:#08111feF;border-bottom:1px solid var(--line);backdrop-filter:blur(16px)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:14px 0}.brand{font-weight:800;letter-spacing:.2px;line-height:1.2}.brand small{display:block;color:var(--cyan);font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase}.navlinks{display:flex;gap:16px;flex-wrap:wrap}.navlinks a{text-decoration:none;color:var(--muted);font-size:.9rem}.navlinks a:hover{color:var(--text)}
+.hero{padding:78px 0 60px}.eyebrow{color:var(--cyan);font-size:.8rem;letter-spacing:2px;text-transform:uppercase;font-weight:800}.hero-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:36px;align-items:center}.hero h1{font-size:clamp(2.4rem,6vw,4.6rem);line-height:1.03;letter-spacing:-2px;margin:14px 0 20px}.hero h1 span{color:var(--cyan)}.lead{font-size:1.12rem;color:var(--muted);max-width:700px}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:26px}.btn{display:inline-block;border-radius:999px;padding:11px 17px;text-decoration:none;font-weight:750;border:1px solid var(--line);background:var(--panel);color:var(--text)}.btn.primary{background:var(--cyan);color:#06121e;border-color:var(--cyan)}.hero-art{border:1px solid #29405d;background:linear-gradient(145deg,#172c47,#0c1727);border-radius:28px;padding:24px;box-shadow:0 30px 80px #0005}.circuit{display:grid;grid-template-columns:1fr 1fr;gap:12px}.chip{min-height:110px;border:1px solid #35516f;border-radius:16px;padding:16px;background:#0b1728}.chip b{display:block;color:var(--cyan);font-size:1.1rem}.chip span{color:var(--muted);font-size:.86rem}.pulse{height:4px;background:linear-gradient(90deg,var(--cyan),var(--blue),transparent);border-radius:8px;margin:20px 0}
+section{padding:58px 0;border-top:1px solid #1b2b40}.section-head{max-width:760px;margin-bottom:28px}.section-head h2{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.15;margin:8px 0 12px}.section-head p{color:var(--muted);margin:0}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.card{background:linear-gradient(150deg,var(--panel),#0c1727);border:1px solid var(--line);border-radius:var(--radius);padding:22px;min-width:0}.card h3{margin:4px 0 10px;font-size:1.18rem}.card p,.card li{color:var(--muted)}.icon{font-size:1.55rem}.tag{display:inline-block;background:#16364a;color:var(--cyan);border:1px solid #285267;border-radius:999px;padding:3px 9px;font-size:.75rem;font-weight:750;margin:2px}
+.feature{display:grid;grid-template-columns:.85fr 1.15fr;gap:24px;align-items:start}.feature img,.media-card img{display:block;width:100%;height:auto;max-height:420px;object-fit:contain;background:#f4f7fb;border-radius:14px;padding:8px}.media-card img{max-height:260px}.caption{font-size:.8rem;color:var(--muted);margin-top:8px}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:14px}table{border-collapse:collapse;width:100%;min-width:540px;background:#0d1929}th,td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--cyan);background:#14243a}td{color:var(--muted)}
+.callout{border-left:4px solid var(--lime);background:#14251f;padding:16px 18px;border-radius:0 12px 12px 0;color:#dcebd6;margin:18px 0}.warning{border-left-color:#ffc66d;background:#2a2115;color:#f5e7cd}
+.searchbar{display:flex;gap:10px;margin:18px 0 24px}.searchbar input{flex:1;min-width:0;padding:12px 14px;border-radius:12px;background:#0b1728;border:1px solid var(--line);color:var(--text);font:inherit}.resource-list{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.resource{border:1px solid var(--line);border-radius:14px;padding:16px;background:#0d1929}.resource h3{margin:0 0 4px;font-size:1rem}.resource p{color:var(--muted);margin:0 0 8px;font-size:.9rem}
+details{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#0d1929;margin:10px 0}summary{cursor:pointer;font-weight:750}details p{color:var(--muted)}
+footer{padding:34px 0;color:var(--muted);border-top:1px solid var(--line)}.foot{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media(max-width:850px){.hero-grid,.feature{grid-template-columns:1fr}.grid{grid-template-columns:repeat(2,1fr)}.nav{align-items:flex-start;flex-direction:column}.navlinks{gap:10px}.hero{padding-top:50px}}
+@media(max-width:560px){.grid,.resource-list{grid-template-columns:1fr}.hero h1{letter-spacing:-1px}.hero-art{padding:14px}.chip{min-height:95px;padding:12px}.navlinks a{font-size:.82rem}}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <a class="brand" href="#inicio" style="text-decoration:none;color:var(--text)">TA<span style="color:var(--cyan)">A</span><small>Laboratorio de autotrónica</small></a>
+  <nav class="navlinks" aria-label="Navegación principal">
+    <a href="#hardware">Hardware</a><a href="#software">Software</a><a href="#componentes">Componentes</a><a href="#practicas">Prácticas</a><a href="#biblioteca">Biblioteca</a>
+  </nav>
+</div></header>
+<main>
+<section class="hero" id="inicio" style="border-top:0">
+<div class="wrap hero-grid">
+ <div><div class="eyebrow">Educación · Electrónica · Datos del vehículo</div>
+  <h1>Telemetría aplicada a la <span>Autotrónica</span></h1>
+  <p class="lead">Un espacio de aprendizaje técnico para comprender cómo se capturan, procesan y transmiten datos mediante sensores, microcontroladores y aplicaciones. Material propio, documentación, imágenes y prácticas paso a paso.</p>
+  <div class="actions"><a class="btn primary" href="#componentes">Explorar componentes ↓</a><a class="btn" href="#biblioteca">Consultar documentación</a></div>
+ </div>
+ <div class="hero-art" aria-label="Resumen de sistemas de telemetría"><div class="circuit">
+  <div class="chip"><b>01 / Sensar</b><span>Temperatura, humedad y señales</span></div><div class="chip"><b>02 / Procesar</b><span>ESP32 y lógica embebida</span></div>
+  <div class="chip"><b>03 / Transmitir</b><span>Wi-Fi, Bluetooth y LoRa</span></div><div class="chip"><b>04 / Visualizar</b><span>App móvil y panel de datos</span></div>
+ </div><div class="pulse"></div><span class="tag">Hardware</span><span class="tag">Firmware</span><span class="tag">App Inventor</span></div>
+</div>
+</section>
+
+<section id="sobre"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">El proyecto</div><h2>Del componente al dato útil</h2><p>La telemetría consiste en medir variables a distancia y enviar los datos a otro equipo para registrarlos o visualizarlos. En autotrónica se puede aplicar al monitoreo de temperatura, tensión, estados de sensores y variables del vehículo, siempre usando interfaces eléctricas adecuadas.</p></div>
+ <div class="grid">
+  <article class="card"><div class="icon">⌁</div><h3>Aprendizaje técnico</h3><p>Conceptos explicados con ejemplos, esquemas, tablas de pines y documentación verificable.</p></article>
+  <article class="card"><div class="icon">◉</div><h3>Prácticas reproducibles</h3><p>Conexiones, código, pruebas y criterios para distinguir una medición correcta de un error.</p></article>
+  <article class="card"><div class="icon">↗</div><h3>Fuentes confiables</h3><p>Datasheets, manuales de fabricantes, documentación oficial y enlaces externos seleccionados.</p></article>
+ </div>
+</div></section>
+
+<section id="hardware"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">01 · Hardware</div><h2>Plataforma ESP32 y periféricos</h2><p>El hardware es la parte física: microcontrolador, sensores, módulos de comunicación, alimentación, conectores y cableado.</p></div>
+ <div class="feature">
+  <div>
+   <img src="assets/pinout-esp32-devkit.jpg" alt="Mapa de pines de una placa ESP32 DevKitC con módulo ESP-WROOM-32" onerror="this.style.display='none'">
+   <p class="caption">Imagen de referencia suministrada: pinout de una ESP32 DevKitC. El pinout exacto depende de la placa y de la variante del módulo.</p>
+  </div>
+  <div><h3>ESP32: unidad de control</h3>
+   <p>El ESP32 es una familia de microcontroladores con conectividad inalámbrica. En una placa de desarrollo, ejecuta el programa, lee entradas, procesa datos y controla salidas. El módulo ESP-WROOM-32 clásico integra Wi‑Fi y Bluetooth y dispone de interfaces como GPIO, ADC, SPI, I²C y UART; las capacidades concretas dependen de la variante.</p>
+   <div class="table-wrap"><table><thead><tr><th>Interfaz</th><th>Uso típico</th></tr></thead><tbody>
+   <tr><td>GPIO</td><td>Entradas y salidas digitales para señales compatibles.</td></tr><tr><td>ADC</td><td>Lectura de ciertas señales analógicas dentro de los límites eléctricos.</td></tr><tr><td>SPI</td><td>Comunicación rápida con periféricos como el módulo LoRa.</td></tr><tr><td>I²C</td><td>Bus de dos líneas usado por sensores y expansores compatibles.</td></tr><tr><td>UART</td><td>Comunicación serie, por ejemplo con un equipo o módulo externo.</td></tr>
+   </tbody></table></div>
+   <div class="callout warning"><b>Seguridad eléctrica:</b> los GPIO del ESP32 trabajan con lógica de 3,3 V y no son tolerantes a 5 V. No conectar directamente señales automotrices de 12 V, bobinas, inyectores ni líneas de comunicación del vehículo. Usar acondicionamiento, protección y una interfaz diseñada para cada señal.</div>
+   <p><a href="https://documentation.espressif.com/esp32-wroom-32_datasheet_en.html" target="_blank" rel="noopener">Datasheet oficial ESP32-WROOM-32 ↗</a></p>
+  </div>
+ </div>
+</div></section>
+
+<section id="software"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">02 · Software</div><h2>Firmware, herramientas y aplicación móvil</h2><p>El software define qué hace el circuito, cómo interpreta los datos y cómo los presenta al usuario.</p></div>
+ <div class="grid">
+  <article class="card"><span class="tag">Firmware</span><h3>Arduino IDE / ESP-IDF</h3><p>El firmware es el programa que se ejecuta dentro del ESP32. Puede inicializar sensores, leer entradas, filtrar valores, controlar eventos y enviar datos. Arduino IDE facilita comenzar; ESP-IDF ofrece el entorno oficial de desarrollo de Espressif.</p><p><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/" target="_blank" rel="noopener">Documentación ESP-IDF ↗</a></p></article>
+  <article class="card"><span class="tag">Aplicación móvil</span><h3>MIT App Inventor</h3><p>Plataforma visual para diseñar pantallas y programar con bloques. La interfaz puede mostrar temperatura, humedad, estados y avisos. Los componentes de conectividad disponibles dependen del método elegido y del sistema operativo del teléfono.</p><p><a href="https://appinventor.mit.edu/" target="_blank" rel="noopener">Sitio oficial ↗</a> · <a href="https://ai2.appinventor.mit.edu/" target="_blank" rel="noopener">Abrir App Inventor ↗</a></p></article>
+  <article class="card"><span class="tag">Interfaz</span><h3>Protocolo de datos</h3><p>Definir un formato consistente —por ejemplo, <code>TEMP=24.5;HUM=60</code>— facilita separar los campos, validar datos y mostrar cada variable en su etiqueta correspondiente.</p><p>Agregar unidades, fecha/hora, estado de conexión y tratamiento de errores mejora la lectura.</p></article>
+ </div>
+ <div class="feature" style="margin-top:24px">
+  <div><img src="assets/app-inventor-bloques.png" alt="Captura de MIT App Inventor con bloques para recibir datos Bluetooth y actualizar indicadores" onerror="this.style.display='none'"><p class="caption">Captura aportada del proyecto en MIT App Inventor.</p></div>
+  <div><h3>Proyecto de App Inventor: lectura y visualización</h3><p>En la captura se observa una lógica basada en un temporizador que comprueba la conexión Bluetooth, consulta si hay bytes disponibles, recibe texto, lo separa en una lista y actualiza campos de pantalla. También compara estados recibidos para mostrar indicadores de colores.</p><ul><li><b>Conexión:</b> comprobar el estado antes de leer.</li><li><b>Recepción:</b> definir un delimitador claro entre mensajes o variables.</li><li><b>Validación:</b> verificar que llegaron todos los campos antes de usarlos.</li><li><b>Visualización:</b> mostrar unidades y un estado de dato actualizado/desconectado.</li></ul><p>La captura permite describir la lógica general; para verificar los bloques exactos y corregir errores se necesitaría el archivo del proyecto de App Inventor (.aia).</p></div>
+ </div>
+</div></section>
+
+<section id="componentes"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">03 · Fichas técnicas</div><h2>Componentes de las imágenes</h2><p>Las fichas siguientes parten de las fotografías aportadas y se pueden ampliar con datasheets, fotos propias y pruebas de laboratorio.</p></div>
+ <div class="grid">
+  <article class="card media-card"><img src="assets/pinout-lora-ra02.jpg" alt="Pinout del módulo de radio LoRa RA-02 basado en SX1278" onerror="this.style.display='none'"><h3>LoRa RA-02 · SX1278</h3><p>Módulo de radio para comunicación de largo alcance y bajo consumo. La variante mostrada trabaja habitualmente en la banda de 433 MHz y se comunica con el microcontrolador mediante SPI.</p><ul><li><b>3V3:</b> alimentación de 3,3 V según el módulo.</li><li><b>GND:</b> referencia eléctrica común.</li><li><b>SCK, MOSI, MISO, NSS:</b> bus SPI.</li><li><b>RST y DIOx:</b> reinicio y señales digitales/interruptores.</li><li><b>ANT/IPEX:</b> conexión de antena; no transmitir sin la antena adecuada.</li></ul><p class="caption">La ficha 7SEMI suministrada indica rango 410–525 MHz, SPI y alimentación típica de 3,3 V. Alcance real depende de antenas, obstáculos, potencia, configuración y normativa local.</p></article>
+  <article class="card media-card"><img src="assets/sensor-dht11.jpg" alt="Sensor DHT11 y módulo DHT11 con pines VCC DATA y GND" onerror="this.style.display='none'"><h3>DHT11 · Temperatura y humedad</h3><p>Sensor digital básico para medir temperatura y humedad relativa ambiental. No mide directamente temperatura de motor ni fluidos automotrices y no está diseñado para ambientes severos del vehículo.</p><ul><li><b>VCC:</b> alimentación conforme a la versión del sensor/módulo.</li><li><b>DATA:</b> comunicación digital de un hilo con protocolo propio.</li><li><b>GND:</b> masa.</li><li><b>NC:</b> en la versión de cuatro pines, el pin 3 suele no conectarse.</li></ul><p class="caption">El módulo de tres pines puede incluir componentes adicionales y tener serigrafía distinta. Confirmar siempre el modelo y su documentación.</p></article>
+  <article class="card media-card"><div style="padding:24px;text-align:center;color:var(--cyan);font-size:2.2rem">↔</div><h3>Cadena de telemetría</h3><p><b>Sensor → ESP32 → enlace de comunicación → receptor/app → usuario.</b></p><p>El sensor produce una medición; el firmware la valida y codifica; el enlace la transporta; la aplicación la decodifica y la presenta con unidades y estado.</p><p>Para telemetría vehicular real, añadir protección contra transitorios, filtrado, conversión de niveles y diseño de alimentación apropiado.</p></article>
+ </div>
+ <div class="callout"><b>Nota de investigación:</b> el pinout de la imagen ayuda a identificar conexiones, pero no sustituye al datasheet de la revisión exacta. Antes de cablear, comparar la serigrafía de la placa, el fabricante y el modelo.</div>
+</div></section>
+
+<section id="practicas"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">04 · Laboratorio</div><h2>Prácticas guiadas</h2><p>Ejercicios iniciales para comprender el recorrido completo de los datos, desde la señal física hasta la pantalla del teléfono.</p></div>
+ <div class="grid">
+  <article class="card"><h3>Práctica 1 · Leer DHT11</h3><ol><li>Identificar versión y pines.</li><li>Conectar alimentación y masa comunes.</li><li>Leer temperatura/humedad con una librería compatible.</li><li>Comprobar lecturas y registrar unidades.</li></ol></article>
+  <article class="card"><h3>Práctica 2 · Enviar datos al móvil</h3><ol><li>Definir el formato del mensaje.</li><li>Configurar el enlace compatible con la app.</li><li>Recibir texto y separar campos en App Inventor.</li><li>Mostrar valores y avisar si se pierde conexión.</li></ol></article>
+  <article class="card"><h3>Práctica 3 · Enlace LoRa</h3><ol><li>Preparar dos nodos: emisor y receptor.</li><li>Verificar alimentación, SPI, frecuencia y antena.</li><li>Enviar paquetes con identificador y contador.</li><li>Medir pérdidas, latencia y alcance en condiciones documentadas.</li></ol></article>
+ </div>
+ <div class="callout warning"><b>Para conectar con un vehículo:</b> comenzar en banco con una fuente limitada en corriente. Las señales de sensores, CAN, alimentación y actuadores automotrices requieren interfaces específicas; una conexión incorrecta puede dañar la placa o el vehículo.</div>
+</div></section>
+
+<section id="biblioteca"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">05 · Recursos</div><h2>Biblioteca técnica y archivos del proyecto</h2><p>Buscá recursos por palabra clave. Los archivos incluidos son los que se aportaron para este sitio.</p></div>
+ <div class="searchbar"><input id="resourceSearch" type="search" placeholder="Buscar ESP32, LoRa, DHT11, App Inventor…" aria-label="Buscar recursos"><button class="btn primary" id="clearSearch" type="button">Limpiar</button></div>
+ <div class="resource-list" id="resourceList">
+  <article class="resource" data-search="esp32 datasheet hardware gpio adc spi i2c uart"><h3>ESP32-WROOM-32 · Datasheet oficial</h3><p>Características, pinout, periféricos y condiciones eléctricas.</p><a href="https://documentation.espressif.com/esp32-wroom-32_datasheet_en.html" target="_blank" rel="noopener">Abrir documentación ↗</a></article>
+  <article class="resource" data-search="esp32 esp-idf software firmware programación"><h3>ESP-IDF · Guía oficial</h3><p>Entorno de desarrollo de Espressif para firmware.</p><a href="https://docs.espressif.com/projects/esp-idf/en/stable/esp32/" target="_blank" rel="noopener">Abrir guía ↗</a></article>
+  <article class="resource" data-search="mit app inventor app móvil bloques bluetooth software"><h3>MIT App Inventor</h3><p>Diseño de aplicaciones móviles con bloques.</p><a href="https://appinventor.mit.edu/" target="_blank" rel="noopener">Abrir sitio ↗</a></article>
+  <article class="resource" data-search="lora sx1278 ra02 semtech datasheet radio"><h3>SX1276/77/78/79 · Datasheet Semtech</h3><p>Referencia del transceptor LoRa y sus interfaces.</p><a href="https://www.semtech.com/products/wireless-rf/lora-connect/sx1278" target="_blank" rel="noopener">Producto oficial ↗</a></article>
+  <article class="resource" data-search="documentos pdf telemetria propios apuntes material"><h3>Documentos aportados</h3><p>PDF de referencia suministrados por el equipo del proyecto.</p><div class="pdf-links">
+  <a href="documentos/telemetria_1.pdf" target="_blank">Telemetría 1 (PDF) ↗</a><br>
+  <a href="documentos/telemetria_2.pdf" target="_blank">Telemetría 2 (PDF) ↗</a><br>
+  <a href="documentos/telemetria_3.pdf" target="_blank">Telemetría 3 (PDF) ↗</a><br>
+  <a href="documentos/telemetria_4.pdf" target="_blank">Telemetría 4 (PDF) ↗</a>
+ </div></article>
+  <article class="resource" data-search="fotos imágenes pinout dht11 esp32 app inventor lora"><h3>Imágenes del laboratorio</h3><p>Pinouts, sensor DHT11, placa ESP32 y bloques de App Inventor incluidos en la carpeta assets.</p></article>
+ </div>
+ <p class="caption">Los enlaces externos llevan a sitios de terceros. Verificá versión, modelo de placa y región de radio antes de usar especificaciones en un montaje.</p>
+</div></section>
+
+<section id="faq"><div class="wrap">
+ <div class="section-head"><div class="eyebrow">Preguntas frecuentes</div><h2>Conceptos clave</h2></div>
+ <details><summary>¿ESP32 es hardware o software?</summary><p>ESP32 es el microcontrolador/módulo físico (hardware). El firmware es el software que se programa para que lea sensores, procese valores y se comunique con otros equipos.</p></details>
+ <details><summary>¿LoRa es lo mismo que Wi‑Fi o Bluetooth?</summary><p>No. Son tecnologías de comunicación distintas. LoRa suele priorizar enlaces de largo alcance y baja tasa de datos; Wi‑Fi prioriza redes de mayor caudal y Bluetooth se usa habitualmente en enlaces cercanos. El alcance depende de la instalación y del entorno.</p></details>
+ <details><summary>¿Puedo usar el DHT11 en el motor de un automóvil?</summary><p>No es apropiado para medir directamente la temperatura de un motor o refrigerante. Para una aplicación automotriz se requiere un sensor con rango, encapsulado y acondicionamiento adecuados.</p></details>
+ <details><summary>¿La página se actualiza sola cuando agrego nuevos archivos?</summary><p>No: esta versión es un sitio estático. Para añadir contenido, se incorporan los archivos a la carpeta del sitio y se actualiza el HTML. Después se vuelve a publicar el sitio.</p></details>
+</div></section>
+</main>
+<footer><div class="wrap foot"><div><b>Telemetría Aplicada a la Autotrónica</b><br><span>Proyecto educativo independiente.</span></div><div>Contenido técnico con fuentes consultables.<br><span>© <span id="year"></span> · Versión inicial</span></div></div></footer>
+<script>
+document.getElementById('year').textContent = new Date().getFullYear();
+const search = document.getElementById('resourceSearch');
+const resources = [...document.querySelectorAll('#resourceList .resource')];
+function filterResources(){const q=search.value.trim().toLowerCase();resources.forEach(r=>{r.style.display=(!q || (r.innerText+' '+r.dataset.search).toLowerCase().includes(q))?'':'none';});}
+search.addEventListener('input',filterResources);
+document.getElementById('clearSearch').addEventListener('click',()=>{search.value='';filterResources();search.focus();});
+</script>
+</body>
+</html>
