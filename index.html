@@ -27,7 +27,7 @@ footer{padding:34px 0;color:var(--muted);border-top:1px solid var(--line)}.foot{
 <header><div class="wrap nav">
   <a class="brand" href="#inicio" style="text-decoration:none;color:var(--text)">TA<span style="color:var(--cyan)">A</span><small>Laboratorio de autotrónica</small></a>
   <nav class="navlinks" aria-label="Navegación principal">
-    <a href="#hardware">Hardware</a><a href="#software">Software</a><a href="#componentes">Componentes</a><a href="#practicas">Prácticas</a><a href="#biblioteca">Biblioteca</a>
+    <a href="#hardware">Hardware</a><a href="#software">Software</a><a href="#componentes">Componentes</a><a href="#practicas">Prácticas</a><a href="#biblioteca">Biblioteca</a><a href="#arduino">Arduino</a><a href="#mi-app">Mi App</a><a href="#realizacion">Realización</a><a href="#funcionamiento">Video</a>
   </nav>
 </div></header>
 <main>
@@ -125,6 +125,280 @@ footer{padding:34px 0;color:var(--muted);border-top:1px solid var(--line)}.foot{
  <details><summary>¿Puedo usar el DHT11 en el motor de un automóvil?</summary><p>No es apropiado para medir directamente la temperatura de un motor o refrigerante. Para una aplicación automotriz se requiere un sensor con rango, encapsulado y acondicionamiento adecuados.</p></details>
  <details><summary>¿La página se actualiza sola cuando agrego nuevos archivos?</summary><p>No: esta versión es un sitio estático. Para añadir contenido, se incorporan los archivos a la carpeta del sitio y se actualiza el HTML. Después se vuelve a publicar el sitio.</p></details>
 </div></section>
+<style>
+/* Secciones añadidas: mantienen la paleta del sitio original */
+.project-subnav{display:flex;flex-wrap:wrap;gap:10px;margin:22px 0}.project-subnav a{color:var(--cyan);text-decoration:none;background:var(--panel);border:1px solid var(--line);border-radius:30px;padding:8px 15px}
+.project-block{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(15px,3vw,28px);margin:20px 0 32px;min-width:0}.project-block h3{font-size:1.5rem;margin:0 0 8px}.project-block p{color:var(--muted)}
+.project-code-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:22px}.project-copy{border:1px solid var(--cyan);background:#17334b;color:var(--cyan);border-radius:10px;padding:8px 12px;cursor:pointer}
+.project-code{max-height:560px;overflow:auto;background:#050d19;color:#e3f1ff;padding:20px;border:1px solid #314761;border-radius:14px;tab-size:2;font-size:13px;line-height:1.55;white-space:pre;}
+.project-photo{display:block;max-width:100%;height:auto;max-height:640px;object-fit:contain;border-radius:12px;margin:16px auto;background:#0a1422}.project-block figure{margin:20px 0}.project-block figcaption{color:var(--muted);font-size:.92rem;text-align:center}
+.project-gallery{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}.project-gallery a{display:flex;align-items:center;justify-content:center;background:#0b1728;border:1px solid var(--line);border-radius:14px;padding:10px;min-height:190px}.project-gallery img{width:100%;height:100%;max-height:340px;object-fit:contain}.project-video{width:100%;max-height:75vh;background:black;border-radius:16px}
+@media(max-width:650px){.project-gallery{grid-template-columns:1fr}.project-code{font-size:12px;padding:12px}}
+</style>
+<!-- INICIO DE APARTADOS NUEVOS -->
+<section id="arduino"><div class="wrap"><div class="section-head"><div class="eyebrow">Proyecto práctico</div><h2>Arduino</h2><p>Programación de los módulos emisor y receptor del proyecto.</p></div>
+<div class="project-subnav"><a href="#emisor">Emisor</a><a href="#receptor">Receptor</a></div>
+<article class="project-block" id="emisor"><h3>Emisor</h3><p>ESP32 con DHT11 y LoRa: lectura de temperatura y humedad, transmisión cada dos segundos y activación del cooler cuando la temperatura supera los 26 °C.</p><div class="project-code-head"><strong>emisor.ino</strong><button class="project-copy" type="button" onclick="navigator.clipboard.writeText(document.getElementById('emisor-code').textContent).then(()=>{this.textContent='¡Copiado!';setTimeout(()=>this.textContent='Copiar código',1600)})">Copiar código</button></div><pre class="project-code"><code id="emisor-code">#include &lt;SPI.h&gt;
+#include &lt;LoRa.h&gt;
+#include &lt;DHT.h&gt;
+
+#define DHTPIN 4
+#define DHTTYPE DHT11
+
+#define COOLER 27
+
+#define LORA_NSS   5
+#define LORA_RST  14
+#define LORA_DIO0 26
+#define LORA_FREQ 433E6
+
+DHT dht(DHTPIN, DHTTYPE);
+
+unsigned long tiempoAnterior = 0;
+const unsigned long intervalo = 2000;
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(COOLER, OUTPUT);
+  digitalWrite(COOLER, LOW);
+
+  dht.begin();
+
+  SPI.begin(18, 19, 23, LORA_NSS);
+  LoRa.setPins(LORA_NSS, LORA_RST, LORA_DIO0);
+
+  if (!LoRa.begin(LORA_FREQ)) {
+    Serial.println(&quot;Error al iniciar LoRa&quot;);
+
+    while (true) {
+      digitalWrite(COOLER, LOW);
+      delay(1000);
+    }
+  }
+
+  Serial.println(&quot;Emisor LoRa iniciado&quot;);
+}
+
+void loop() {
+  if (millis() - tiempoAnterior &gt;= intervalo) {
+    tiempoAnterior = millis();
+
+    float temperatura = dht.readTemperature();
+    float humedad = dht.readHumidity();
+
+    if (isnan(temperatura) || isnan(humedad)) {
+      Serial.println(&quot;Error al leer el DHT11&quot;);
+      return;
+    }
+
+    // Control local del cooler
+    if (temperatura &gt; 26.0) {
+      digitalWrite(COOLER, HIGH);
+      Serial.println(&quot;Cooler del emisor: ENCENDIDO&quot;);
+    } else {
+      digitalWrite(COOLER, LOW);
+      Serial.println(&quot;Cooler del emisor: APAGADO&quot;);
+    }
+
+    // Enviar datos al receptor por LoRa
+    String datos = String(temperatura, 1) + &quot;,&quot; +
+                   String(humedad, 1);
+
+    LoRa.beginPacket();
+    LoRa.print(datos);
+
+    if (LoRa.endPacket() == 1) {
+      Serial.print(&quot;Temperatura: &quot;);
+      Serial.print(temperatura);
+      Serial.print(&quot; C | Humedad: &quot;);
+      Serial.print(humedad);
+      Serial.println(&quot; %&quot;);
+    } else {
+      Serial.println(&quot;Error al enviar por LoRa&quot;);
+    }
+  }
+}</code></pre><figure><img class="project-photo" src="assets/emisor.jpeg" alt="Montaje físico del emisor con ESP32, sensor DHT11 y cooler" loading="lazy"><figcaption>Montaje físico del emisor</figcaption></figure></article>
+<article class="project-block" id="receptor"><h3>Receptor</h3><p>ESP32 con LoRa y Bluetooth: recibe las mediciones, controla los indicadores LED y el cooler, y envía los datos a la aplicación móvil.</p><div class="project-code-head"><strong>receptor.ino</strong><button class="project-copy" type="button" onclick="navigator.clipboard.writeText(document.getElementById('receptor-code').textContent).then(()=>{this.textContent='¡Copiado!';setTimeout(()=>this.textContent='Copiar código',1600)})">Copiar código</button></div><pre class="project-code"><code id="receptor-code">#include &lt;SPI.h&gt;
+#include &lt;LoRa.h&gt;
+#include &quot;BluetoothSerial.h&quot;
+
+// Bluetooth Classic
+BluetoothSerial SerialBT;
+
+// LoRa SX1278
+#define LORA_NSS   5
+#define LORA_RST  14
+#define LORA_DIO0 26
+#define LORA_FREQ 433E6
+
+// Salidas
+#define LED_VERDE    25
+#define LED_AMARILLO 32
+#define LED_ROJO     33
+#define COOLER       27
+
+float temperatura = 0;
+float humedad = 0;
+
+String estadoLED = &quot;NINGUNO&quot;;
+String estadoCooler = &quot;APAGADO&quot;;
+
+bool hayDatos = false;
+unsigned long ultimoPaquete = 0;
+unsigned long ultimoEnvioBT = 0;
+
+const unsigned long tiempoLimite = 10000;
+const unsigned long intervaloBT = 1000;
+
+void apagarSalidas() {
+  digitalWrite(LED_VERDE, LOW);
+  digitalWrite(LED_AMARILLO, LOW);
+  digitalWrite(LED_ROJO, LOW);
+  digitalWrite(COOLER, LOW);
+
+  estadoLED = &quot;NINGUNO&quot;;
+  estadoCooler = &quot;APAGADO&quot;;
+}
+
+void controlarTemperatura() {
+  apagarSalidas();
+
+  if (temperatura &lt; 23.0) {
+    digitalWrite(LED_VERDE, HIGH);
+    estadoLED = &quot;VERDE&quot;;
+
+  } else if (temperatura &gt; 24.0 &amp;&amp;
+             temperatura &lt;= 26.0) {
+    digitalWrite(LED_AMARILLO, HIGH);
+    estadoLED = &quot;AMARILLO&quot;;
+
+  } else if (temperatura &gt; 26.0) {
+    digitalWrite(LED_ROJO, HIGH);
+    digitalWrite(COOLER, HIGH);
+
+    estadoLED = &quot;ROJO&quot;;
+    estadoCooler = &quot;ENCENDIDO&quot;;
+  }
+}
+
+void enviarBluetooth() {
+  if (!SerialBT.hasClient()) {
+    return;
+  }
+
+  if (!hayDatos) {
+    SerialBT.println(&quot;NA,NA,SIN_DATOS,APAGADO&quot;);
+    return;
+  }
+
+  SerialBT.print(temperatura, 1);
+  SerialBT.print(&quot;,&quot;);
+  SerialBT.print(humedad, 1);
+  SerialBT.print(&quot;,&quot;);
+  SerialBT.print(estadoLED);
+  SerialBT.print(&quot;,&quot;);
+  SerialBT.println(estadoCooler);
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(LED_VERDE, OUTPUT);
+  pinMode(LED_AMARILLO, OUTPUT);
+  pinMode(LED_ROJO, OUTPUT);
+  pinMode(COOLER, OUTPUT);
+
+  apagarSalidas();
+
+  // Iniciar Bluetooth
+  SerialBT.begin(&quot;Monitor_LoRa_ESP32&quot;);
+  Serial.println(&quot;Bluetooth iniciado&quot;);
+
+  // Iniciar LoRa
+  SPI.begin(18, 19, 23, LORA_NSS);
+  LoRa.setPins(LORA_NSS, LORA_RST, LORA_DIO0);
+
+  if (!LoRa.begin(LORA_FREQ)) {
+    Serial.println(&quot;Error al iniciar LoRa&quot;);
+    while (true) {
+      apagarSalidas();
+      delay(1000);
+    }
+  }
+
+  Serial.println(&quot;Receptor LoRa iniciado&quot;);
+}
+
+void loop() {
+  int tamano = LoRa.parsePacket();
+
+  if (tamano &gt; 0) {
+    String datos = &quot;&quot;;
+
+    while (LoRa.available()) {
+      datos += (char)LoRa.read();
+    }
+
+    int separador = datos.indexOf(&#x27;,&#x27;);
+
+    if (separador &gt; 0) {
+      float nuevaTemperatura =
+          datos.substring(0, separador).toFloat();
+
+      float nuevaHumedad =
+          datos.substring(separador + 1).toFloat();
+
+      // Aceptar temperaturas y humedades validas
+      if (nuevaTemperatura &gt;= -40.0 &amp;&amp;
+          nuevaTemperatura &lt;= 80.0 &amp;&amp;
+          nuevaHumedad &gt;= 0.0 &amp;&amp;
+          nuevaHumedad &lt;= 100.0) {
+
+        temperatura = nuevaTemperatura;
+        humedad = nuevaHumedad;
+
+        hayDatos = true;
+        ultimoPaquete = millis();
+
+        controlarTemperatura();
+
+        Serial.print(&quot;Temperatura: &quot;);
+        Serial.print(temperatura);
+        Serial.print(&quot; C | Humedad: &quot;);
+        Serial.print(humedad);
+        Serial.print(&quot; % | LED: &quot;);
+        Serial.print(estadoLED);
+        Serial.print(&quot; | Cooler: &quot;);
+        Serial.println(estadoCooler);
+      }
+    }
+  }
+
+  // Seguridad ante perdida de comunicacion LoRa
+  if (hayDatos &amp;&amp;
+      millis() - ultimoPaquete &gt; tiempoLimite) {
+    hayDatos = false;
+    apagarSalidas();
+    Serial.println(&quot;Sin datos LoRa: salidas apagadas&quot;);
+  }
+
+  // Actualizar la aplicacion cada segundo
+  if (millis() - ultimoEnvioBT &gt;= intervaloBT) {
+    ultimoEnvioBT = millis();
+    enviarBluetooth();
+  }
+}</code></pre><figure><img class="project-photo" src="assets/receptor.jpeg" alt="Montaje físico del receptor ESP32 con indicadores LED" loading="lazy"><figcaption>Montaje físico del receptor ESP32 con indicadores LED</figcaption></figure></article>
+</div></section>
+<section id="mi-app"><div class="wrap"><div class="section-head"><div class="eyebrow">Aplicación móvil</div><h2>MIT App Inventor</h2><p>Aplicación para recibir por Bluetooth los datos enviados desde el receptor ESP32.</p></div>
+<article class="project-block"><h3>Programación por bloques</h3><p>Los bloques gestionan la conexión Bluetooth, reciben los datos de temperatura y humedad, y actualizan los indicadores LED y el estado del cooler mediante un temporizador.</p><img class="project-photo" src="assets/bloques-app.png" alt="Bloques de programación de MIT App Inventor" loading="lazy"></article>
+<article class="project-block"><h3>Celular</h3><img class="project-photo" src="assets/celular.jpeg" alt="Vista de la aplicación móvil diseñada en MIT App Inventor" loading="lazy"></article>
+</div></section>
+<section id="realizacion"><div class="wrap"><div class="section-head"><h2>Información y realización del proyecto</h2></div><div class="project-gallery">
+<a href="assets/galeria-1.jpeg" target="_blank" rel="noopener" aria-label="Ampliar fotografía 1"><img src="assets/galeria-1.jpeg" alt="Fotografía 1 del proyecto" loading="lazy"></a><a href="assets/galeria-2.jpeg" target="_blank" rel="noopener" aria-label="Ampliar fotografía 2"><img src="assets/galeria-2.jpeg" alt="Fotografía 2 del proyecto" loading="lazy"></a><a href="assets/galeria-3.jpeg" target="_blank" rel="noopener" aria-label="Ampliar fotografía 3"><img src="assets/galeria-3.jpeg" alt="Fotografía 3 del proyecto" loading="lazy"></a><a href="assets/galeria-4.jpeg" target="_blank" rel="noopener" aria-label="Ampliar fotografía 4"><img src="assets/galeria-4.jpeg" alt="Fotografía 4 del proyecto" loading="lazy"></a><a href="assets/galeria-5.jpeg" target="_blank" rel="noopener" aria-label="Ampliar fotografía 5"><img src="assets/galeria-5.jpeg" alt="Fotografía 5 del proyecto" loading="lazy"></a>
+</div></div></section>
+<section id="funcionamiento"><div class="wrap"><div class="section-head"><h2>Vista previa del funcionamiento</h2></div><video class="project-video" controls playsinline preload="metadata"><source src="assets/funcionamiento.mp4" type="video/mp4">Tu navegador no admite reproducción de video MP4.</video></div></section>
+<!-- FIN DE APARTADOS NUEVOS -->
 </main>
 <footer><div class="wrap foot"><div><b>Telemetría Aplicada a la Autotrónica</b><br><span>Proyecto educativo independiente.</span></div><div>Contenido técnico con fuentes consultables.<br><span>© <span id="year"></span> · Versión inicial</span></div></div></footer>
 <script>
